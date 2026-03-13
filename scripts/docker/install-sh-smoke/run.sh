@@ -13,7 +13,7 @@ if [[ -n "$SMOKE_PREVIOUS_VERSION" ]]; then
   PREVIOUS_VERSION="$SMOKE_PREVIOUS_VERSION"
 else
   VERSIONS_JSON="$(npm view "$INSTALL_PACKAGE" versions --json)"
-  versions_line="$(node - <<'NODE'
+  versions_line="$(VERSIONS_JSON="$VERSIONS_JSON" node - <<'NODE'
 const raw = process.env.VERSIONS_JSON || "[]";
 let versions;
 try {
