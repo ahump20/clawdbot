@@ -10,5 +10,8 @@
   },
   "peerDependencies": {
     "clawdbot": ">=2026.1.26"
+  },
+  "devDependencies": {
+    "clawdbot": "workspace:*"
   }
 }
