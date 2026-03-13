@@ -20,6 +20,8 @@ echo "==> Run installer smoke test (root): $INSTALL_URL"
 docker run --rm -t \
   -v "${LATEST_DIR}:/out" \
   -e CLAWDBOT_INSTALL_URL="$INSTALL_URL" \
+  -e CLAWDBOT_INSTALL_PACKAGE="${CLAWDBOT_INSTALL_PACKAGE:-}" \
+  -e CLAWDBOT_INSTALL_BIN="${CLAWDBOT_INSTALL_BIN:-}" \
   -e CLAWDBOT_INSTALL_LATEST_OUT="/out/latest" \
   -e CLAWDBOT_INSTALL_SMOKE_PREVIOUS="${CLAWDBOT_INSTALL_SMOKE_PREVIOUS:-}" \
   -e CLAWDBOT_INSTALL_SMOKE_SKIP_PREVIOUS="${CLAWDBOT_INSTALL_SMOKE_SKIP_PREVIOUS:-0}" \
@@ -44,6 +46,8 @@ else
   echo "==> Run installer non-root test: $INSTALL_URL"
   docker run --rm -t \
     -e CLAWDBOT_INSTALL_URL="$INSTALL_URL" \
+    -e CLAWDBOT_INSTALL_PACKAGE="${CLAWDBOT_INSTALL_PACKAGE:-}" \
+    -e CLAWDBOT_INSTALL_BIN="${CLAWDBOT_INSTALL_BIN:-}" \
     -e CLAWDBOT_INSTALL_EXPECT_VERSION="$LATEST_VERSION" \
     -e CLAWDBOT_NO_ONBOARD=1 \
     -e DEBIAN_FRONTEND=noninteractive \
@@ -65,6 +69,8 @@ docker run --rm -t \
   --entrypoint /bin/bash \
   -e CLAWDBOT_INSTALL_URL="$INSTALL_URL" \
   -e CLAWDBOT_INSTALL_CLI_URL="$CLI_INSTALL_URL" \
+  -e CLAWDBOT_INSTALL_PACKAGE="${CLAWDBOT_INSTALL_PACKAGE:-}" \
+  -e CLAWDBOT_INSTALL_BIN="${CLAWDBOT_INSTALL_BIN:-}" \
   -e CLAWDBOT_NO_ONBOARD=1 \
   -e DEBIAN_FRONTEND=noninteractive \
   "$NONROOT_IMAGE" -lc "curl -fsSL \"$CLI_INSTALL_URL\" | bash -s -- --set-npm-prefix --no-onboard"

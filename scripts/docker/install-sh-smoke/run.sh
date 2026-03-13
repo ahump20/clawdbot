@@ -2,16 +2,18 @@
 set -euo pipefail
 
 INSTALL_URL="${CLAWDBOT_INSTALL_URL:-https://clawd.bot/install.sh}"
+INSTALL_PACKAGE="${CLAWDBOT_INSTALL_PACKAGE:-clawdbot}"
+INSTALL_BIN="${CLAWDBOT_INSTALL_BIN:-$INSTALL_PACKAGE}"
 SMOKE_PREVIOUS_VERSION="${CLAWDBOT_INSTALL_SMOKE_PREVIOUS:-}"
 SKIP_PREVIOUS="${CLAWDBOT_INSTALL_SMOKE_SKIP_PREVIOUS:-0}"
 
 echo "==> Resolve npm versions"
 if [[ -n "$SMOKE_PREVIOUS_VERSION" ]]; then
-  LATEST_VERSION="$(npm view clawdbot version)"
+  LATEST_VERSION="$(npm view "$INSTALL_PACKAGE" version)"
   PREVIOUS_VERSION="$SMOKE_PREVIOUS_VERSION"
 else
-  VERSIONS_JSON="$(npm view clawdbot versions --json)"
-  versions_line="$(node - <<'NODE'
+  VERSIONS_JSON="$(npm view "$INSTALL_PACKAGE" versions --json)"
+  versions_line="$(VERSIONS_JSON="$VERSIONS_JSON" node - <<'NODE'
 const raw = process.env.VERSIONS_JSON || "[]";
 let versions;
 try {
@@ -44,22 +46,22 @@ if [[ "$SKIP_PREVIOUS" == "1" ]]; then
   echo "==> Skip preinstall previous (CLAWDBOT_INSTALL_SMOKE_SKIP_PREVIOUS=1)"
 else
   echo "==> Preinstall previous (forces installer upgrade path)"
-  npm install -g "clawdbot@${PREVIOUS_VERSION}"
+  npm install -g "${INSTALL_PACKAGE}@${PREVIOUS_VERSION}"
 fi
 
 echo "==> Run official installer one-liner"
 curl -fsSL "$INSTALL_URL" | bash
 
 echo "==> Verify installed version"
-INSTALLED_VERSION="$(clawdbot --version 2>/dev/null | head -n 1 | tr -d '\r')"
+INSTALLED_VERSION="$("$INSTALL_BIN" --version 2>/dev/null | head -n 1 | tr -d '\r')"
 echo "installed=$INSTALLED_VERSION expected=$LATEST_VERSION"
 
 if [[ "$INSTALLED_VERSION" != "$LATEST_VERSION" ]]; then
-  echo "ERROR: expected clawdbot@$LATEST_VERSION, got clawdbot@$INSTALLED_VERSION" >&2
+  echo "ERROR: expected ${INSTALL_PACKAGE}@$LATEST_VERSION, got ${INSTALL_BIN}@$INSTALLED_VERSION" >&2
   exit 1
 fi
 
 echo "==> Sanity: CLI runs"
-clawdbot --help >/dev/null
+"$INSTALL_BIN" --help >/dev/null
 
 echo "OK"
